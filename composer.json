@@ -1,19 +1,20 @@
 {
-    "name": "pars/pars-{component}",
+    "name": "pars/pars-import",
     "description": "",
     "license": "BSD-3-Clause",
     "keywords": [
         "pars"
     ],
     "support": {
-        "docs": "https://docs.parsphp.org/pars-{component}/",
-        "issues": "https://github.com/pars/pars-{component}/issues",
-        "source": "https://github.com/pars/pars-{component}",
-        "rss": "https://github.com/pars/pars-{component}/releases.atom",
+        "docs": "https://docs.parsphp.org/pars-import/",
+        "issues": "https://github.com/pars/pars-import/issues",
+        "source": "https://github.com/pars/pars-import",
+        "rss": "https://github.com/pars/pars-import/releases.atom",
         "forum": "https://discourse.parsphp.org/"
     },
     "require": {
-        "php": "^7.4"
+        "php": "^7.4",
+        "pars/pars-core": "^1.0.x-dev"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.5 || ^8.1",
@@ -21,12 +22,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Pars\\{component-namespace}\\": "src//"
+            "Pars\\Import\\": "src//"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ParsTest\\{component-namespace}\\": "test/"
+            "ParsTest\\Import\\": "test/"
         }
     },
     "extra": {
@@ -34,7 +35,7 @@
             "dev-master": "1.0.x-dev"
         },
         "laminas": {
-            "module": "Pars\\{component-namespace}"
+            "module": "Pars\\Import"
         }
     },
     "config": {

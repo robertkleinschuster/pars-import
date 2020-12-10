@@ -1,3 +1,3 @@
-# pars-{component}
+# pars-import
 
 This component provides ...
