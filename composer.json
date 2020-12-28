@@ -14,7 +14,8 @@
     },
     "require": {
         "php": "^7.4",
-        "pars/pars-core": "^1.0.x-dev"
+        "pars/pars-core": "^1.0.x-dev",
+        "league/oauth2-client": "^2.6"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.5 || ^8.1",
