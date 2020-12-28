@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Pars\Import\Authentication\OAuth\Configurable;
+namespace Pars\Import\Base\Authentication\OAuth\Configurable;
 
 
 use League\OAuth2\Client\Grant\AbstractGrant;

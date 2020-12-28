@@ -1,11 +1,12 @@
 <?php
 
 
-namespace Pars\Import\Authentication\OAuth\Configurable;
+namespace Pars\Import\Base\Authentication\OAuth\Configurable;
 
 use InvalidArgumentException;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use League\OAuth2\Client\Provider\GenericResourceOwner;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
 use Psr\Http\Message\ResponseInterface;
@@ -102,6 +103,8 @@ class ConfigurableProvider extends AbstractProvider
             'responseCode',
             'responseResourceOwnerId',
             'scopes',
+            'urlAuthorize',
+            'urlResourceOwnerDetails',
         ]);
     }
 
@@ -214,6 +217,6 @@ class ConfigurableProvider extends AbstractProvider
      */
     protected function createResourceOwner(array $response, AccessToken $token)
     {
-        return new ConfigurableResourceOwner($response);
+        return new GenericResourceOwner($response, $this->responseResourceOwnerId);
     }
 }
