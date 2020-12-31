@@ -43,7 +43,7 @@ class TeslaImporter extends AbstractImporter
 
     public function run()
     {
-        $token = new AccessToken((array) $this->getBean()->get('Import_Data')['access_token']);
+        $token = new AccessToken((array)$this->getBean()->get('Import_Data')['access_token']);
         $provider = $this->getProvider();
         $request = $provider->getAuthenticatedRequest(
             ConfigurableProvider::METHOD_GET,

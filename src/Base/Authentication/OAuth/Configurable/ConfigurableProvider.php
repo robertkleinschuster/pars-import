@@ -75,7 +75,7 @@ class ConfigurableProvider extends AbstractProvider
     {
         $this->assertRequiredOptions($options);
 
-        $possible   = $this->getConfigurableOptions();
+        $possible = $this->getConfigurableOptions();
         $configured = array_intersect_key($options, array_flip($possible));
 
         foreach ($configured as $key => $value) {
@@ -123,7 +123,7 @@ class ConfigurableProvider extends AbstractProvider
     /**
      * Verifies that all required options have been passed.
      *
-     * @param  array $options
+     * @param array $options
      * @return void
      * @throws InvalidArgumentException
      */
@@ -204,7 +204,7 @@ class ConfigurableProvider extends AbstractProvider
             if (!is_string($error)) {
                 $error = var_export($error, true);
             }
-            $code  = $this->responseCode && !empty($data[$this->responseCode])? $data[$this->responseCode] : 0;
+            $code = $this->responseCode && !empty($data[$this->responseCode]) ? $data[$this->responseCode] : 0;
             if (!is_int($code)) {
                 $code = intval($code);
             }

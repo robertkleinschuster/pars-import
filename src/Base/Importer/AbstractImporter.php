@@ -4,7 +4,6 @@
 namespace Pars\Import\Base\Importer;
 
 
-
 use Niceshops\Bean\Type\Base\BeanAwareInterface;
 use Niceshops\Bean\Type\Base\BeanAwareTrait;
 use Pars\Helper\Validation\ValidationHelperAwareInterface;
