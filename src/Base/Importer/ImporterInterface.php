@@ -10,7 +10,7 @@ interface ImporterInterface
      * @param array $attributes
      * @return mixed
      */
-    public function setup(array &$attributes): bool;
+    public function setup(array &$attributes);
 
     /**
      * @return mixed

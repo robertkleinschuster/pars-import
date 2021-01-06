@@ -21,29 +21,48 @@ class TeslaImporter extends AbstractImporter
         ]);
     }
 
-    public function setup(array &$attributes): bool
+    public function setup(array &$attributes)
     {
         $grant = new ConfigurableGrant('password', ['email', 'password']);
-        $accessToken = $this->getProvider()->getAccessToken(
-            $grant,
-            [
-                'email' => $attributes['tesla_username'],
-                'password' => $attributes['tesla_password']
-            ]
-        );
-        $attributes['Import_Data'] = $this->getBean()->get('Import_Data');
-        $attributes['Import_Data']['access_token'] = $accessToken->jsonSerialize();
-        if ($accessToken->getToken()) {
-            return true;
-        } else {
-            $this->getValidationHelper()->addError('tesla_username', 'Error');
-            return false;
+        try {
+            $provider = $this->getProvider();
+            $accessToken = $provider->getAccessToken(
+                $grant,
+                [
+                    'email' => $attributes['tesla_username'],
+                    'password' => $attributes['tesla_password']
+                ]
+            );
+            $attributes['Import_Data'] = $this->getBean()->get('Import_Data');
+            if ($accessToken->getToken()) {
+                $attributes['Import_Data']['access_token'] = $accessToken->jsonSerialize();
+            } else {
+                $this->getValidationHelper()->addError('General', json_encode($accessToken->jsonSerialize()));
+            }
+        } catch (\Exception $exception) {
+            if ($this->hasTranslator()) {
+                $this->getValidationHelper()->addError(
+                    'tesla_username',
+                    $this->getTranslator()->translate('login.error.credentials', 'admin')
+                );
+                $this->getValidationHelper()->addError(
+                    'tesla_password',
+                    $this->getTranslator()->translate('login.error.credentials', 'admin')
+                );
+            }
+            $this->getValidationHelper()->addError('General', $exception->getMessage());
         }
     }
 
     public function run()
     {
         $token = new AccessToken((array)$this->getBean()->get('Import_Data')['access_token']);
+        $expires = (new \DateTime())->setTimestamp($token->getExpires());
+        $now = new \DateTime();
+        $importData = $this->getBean()->get('Import_Data');
+        if ($now->diff($expires)->days < 7) {
+            $importData['access_token'] = $this->refresh_token($token)->jsonSerialize();
+        }
         $provider = $this->getProvider();
         $request = $provider->getAuthenticatedRequest(
             ConfigurableProvider::METHOD_GET,
@@ -65,9 +84,24 @@ class TeslaImporter extends AbstractImporter
                 $data[$item['id']] = $r['response'];
             }
         }
-        $importData = $this->getBean()->get('Import_Data');
         $importData['data'] = $data;
         $this->getBean()->set('Import_Data', $importData);
+    }
+
+    /**
+     * @param AccessToken $token
+     * @return AccessToken|\League\OAuth2\Client\Token\AccessTokenInterface
+     * @throws \League\OAuth2\Client\Provider\Exception\IdentityProviderException
+     */
+    protected function refresh_token(AccessToken $token): AccessToken
+    {
+        $grant = new ConfigurableGrant('refresh_token', ['refresh_token']);
+        return $this->getProvider()->getAccessToken(
+            $grant,
+            [
+                'refresh_token' => $token->getRefreshToken()
+            ]
+        );
     }
 
 }
