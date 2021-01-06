@@ -56,36 +56,41 @@ class TeslaImporter extends AbstractImporter
 
     public function run()
     {
-        $token = new AccessToken((array)$this->getBean()->get('Import_Data')['access_token']);
-        $expires = (new \DateTime())->setTimestamp($token->getExpires());
-        $now = new \DateTime();
-        $importData = $this->getBean()->get('Import_Data');
-        if ($now->diff($expires)->days < 7) {
-            $importData['access_token'] = $this->refresh_token($token)->jsonSerialize();
-        }
-        $provider = $this->getProvider();
-        $request = $provider->getAuthenticatedRequest(
-            ConfigurableProvider::METHOD_GET,
-            'https://owner-api.teslamotors.com/api/1/vehicles',
-            $token
-        );
-        $request = $request->withAddedHeader('User-Agent', 'PARS');
-        $response = $provider->getParsedResponse($request);
-        $data = [];
-        if (is_array($response['response'])) {
-            foreach ($response['response'] as $item) {
-                $request = $provider->getAuthenticatedRequest(
-                    ConfigurableProvider::METHOD_GET,
-                    'https://owner-api.teslamotors.com/api/1/vehicles/' . $item['id'] . '/vehicle_data',
-                    $token
-                );
-                $request = $request->withAddedHeader('User-Agent', 'PARS');
-                $r = $provider->getParsedResponse($request);
-                $data[$item['id']] = $r['response'];
+        try {
+            $token = new AccessToken((array)$this->getBean()->get('Import_Data')['access_token']);
+            $expires = (new \DateTime())->setTimestamp($token->getExpires());
+            $now = new \DateTime();
+            $importData = $this->getBean()->get('Import_Data');
+            if ($now->diff($expires)->days <= 7) {
+                $token = $this->refresh_token($token);
+                $importData['access_token'] = $token->jsonSerialize();
             }
+            $provider = $this->getProvider();
+            $request = $provider->getAuthenticatedRequest(
+                ConfigurableProvider::METHOD_GET,
+                'https://owner-api.teslamotors.com/api/1/vehicles',
+                $token
+            );
+            $request = $request->withAddedHeader('User-Agent', 'PARS');
+            $response = $provider->getParsedResponse($request);
+            $data = [];
+            if (is_array($response['response'])) {
+                foreach ($response['response'] as $item) {
+                    $request = $provider->getAuthenticatedRequest(
+                        ConfigurableProvider::METHOD_GET,
+                        'https://owner-api.teslamotors.com/api/1/vehicles/' . $item['id'] . '/vehicle_data',
+                        $token
+                    );
+                    $request = $request->withAddedHeader('User-Agent', 'PARS');
+                    $r = $provider->getParsedResponse($request);
+                    $data[$item['id']] = $r['response'];
+                }
+            }
+            $importData['data'] = $data;
+            $this->getBean()->set('Import_Data', $importData);
+        } catch (\Exception $exception) {
+            $this->getValidationHelper()->addError('General', $exception->getMessage());
         }
-        $importData['data'] = $data;
-        $this->getBean()->set('Import_Data', $importData);
     }
 
     /**
