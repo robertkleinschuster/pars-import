@@ -74,7 +74,7 @@ class TeslaImporter extends AbstractImporter
             $request = $request->withAddedHeader('User-Agent', 'PARS');
             $response = $provider->getParsedResponse($request);
             $data = [];
-            if (is_array($response['response'])) {
+            if (isset($response['response']) && is_array($response['response'])) {
                 foreach ($response['response'] as $item) {
                     $request = $provider->getAuthenticatedRequest(
                         ConfigurableProvider::METHOD_GET,
@@ -85,8 +85,8 @@ class TeslaImporter extends AbstractImporter
                     $r = $provider->getParsedResponse($request);
                     $data[$item['id']] = $r['response'];
                 }
+                $importData['data'] = $data;
             }
-            $importData['data'] = $data;
             $this->getBean()->set('Import_Data', $importData);
         } catch (\Exception $exception) {
             $this->getValidationHelper()->addError('General', $exception->getMessage());
